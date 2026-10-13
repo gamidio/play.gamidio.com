@@ -1,0 +1,19 @@
+SuperTux — hosted by Gamidio (gamidio.com)
+
+Original game: The SuperTux Team (based on the original by Bill Kendrick)
+Upstream source: https://github.com/SuperTux/supertux
+Upstream commit: release 0.6.3, official web build (SuperTux-v0.6.3-WASM.zip)
+License: GNU GPL v3 or later (code); data CC BY-SA, GPL, CC BY, CC0, OFL (see data/AUTHORS) (https://github.com/SuperTux/supertux/blob/v0.6.3/LICENSE.txt)
+
+Corresponding source of this copy = the upstream commit above + gamidio-changes.patch in this folder.
+
+Changes made by Gamidio:
+  - supertux2.data repacked: story worlds only (no bonus/community/holiday levels, translations, CJK fonts or unused music), music re-encoded at Vorbis q1; 246 MB -> 137 MB in 6 parts
+  - supertux2.js: data package loaded in parts and joined in the browser
+  - supertux2.html served as index.html
+  - index.html: no alert when the browser does not grant persistent storage
+  - index.html: no alert when persistent storage is not supported
+  - index.html: offline guard: no add-on downloads from GitHub
+  - index.html: coi-serviceworker 0.1.7 (MIT) for cross-origin isolation (threads)
+  - index.html: on-screen gamepad for touch screens (gamidio-gamepad.js, D-048)
+  - gamidio-gamepad.js: Gamidio's on-screen gamepad (written by Gamidio, part of these changes), included in full in this folder

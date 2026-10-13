@@ -1,0 +1,18 @@
+Warzone 2100 — hosted by Gamidio (gamidio.com)
+
+Original game: Pumpkin Studios (original game, 1999) and the Warzone 2100 Project
+Upstream source: https://github.com/Warzone2100/warzone2100
+Upstream commit: release 4.7.0, official web edition (warzone2100_web_wasm32_archive.zip)
+License: GNU GPL v2 or later (code and data; some newer data CC BY-SA 3.0 / CC0, see COPYING in the source) (https://github.com/Warzone2100/warzone2100/blob/master/COPYING)
+
+Corresponding source of this copy = the upstream commit above + gamidio-changes.patch in this folder.
+
+Changes made by Gamidio:
+  - index.html: removed Cloudflare Web Analytics
+  - index.html: https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css served locally as vendor/bootstrap.min.css
+  - service-worker.js: service worker precaches vendor/bootstrap.min.css
+  - index.html: https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js served locally as vendor/bootstrap.bundle.min.js
+  - service-worker.js: service worker precaches vendor/bootstrap.bundle.min.js
+  - index.html: offline guard: no update checks or lobby/IP lookups to third-party servers
+  - index.html: coi-serviceworker 0.1.7 (MIT) for cross-origin isolation
+  - index.html: game's own service worker not registered

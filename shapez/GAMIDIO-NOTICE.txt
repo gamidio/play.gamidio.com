@@ -1,0 +1,21 @@
+shapez — hosted by Gamidio (gamidio.com)
+
+Original game: tobspr Games
+Upstream source: https://github.com/tobspr-games/shapez.io
+Upstream commit: 8a79de5255fb6756f3a1d26579b1e9bc36e0c811
+License: GNU GPL v3 (https://github.com/tobspr-games/shapez.io/blob/master/LICENSE)
+
+Corresponding source of this copy = the upstream commit above + gamidio-changes.patch in this folder.
+
+Changes made by Gamidio:
+  - src/js/application.js: removed Google Analytics import
+  - src/js/application.js: removed shapez game analytics import
+  - src/js/application.js: analytics replaced by no-op objects
+  - src/js/states/preload.js: no analytics beacon on start
+  - src/js/states/preload.js: no discount lookup on start
+  - src/js/states/main_menu.js: no online player count request
+  - src/js/platform/browser/wrapper.js: no ad-blocker check against googleads.g.doubleclick.net
+  - gulp/buildutils.js: relative asset paths (HTML/CSS)
+  - src/js/core/cachebust.js: relative asset paths (JS)
+  - gulp/html.js: removed the disabled Google Analytics snippet
+  - built with: cd gulp && yarn gulp build.web-shapezio (the official web version, demo limits unchanged)

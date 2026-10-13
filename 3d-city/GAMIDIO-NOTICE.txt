@@ -1,0 +1,10 @@
+3D.CITY — hosted by Gamidio (gamidio.com)
+
+Original game: lo-th (3D game); micropolisJS by Graeme McCutcheon (simulation, from the Micropolis source)
+Upstream source: https://github.com/lo-th/3d.city
+Upstream commit: 60fc6de2451ac6cf4df211a7cdae6c55c97e73c7
+License: GNU GPL v3 with additional terms (no SimCity/EA trademarks); author's own code MIT (https://github.com/lo-th/3d.city/blob/gh-pages/LICENSE)
+
+Corresponding source of this copy = the upstream commit above + gamidio-changes.patch in this folder.
+
+Changes made by Gamidio:

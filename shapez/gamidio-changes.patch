@@ -1,0 +1,136 @@
+--- a/gulp/buildutils.js
++++ b/gulp/buildutils.js
+@@ -42,6 +42,6 @@
+      * @param {string} commitHash
+      */
+     cachebust(url, commitHash) {
+-        return "/v/" + commitHash + "/" + url;
++        return url;
+     },
+ };
+--- a/gulp/html.js
++++ b/gulp/html.js
+@@ -54,24 +54,6 @@
+                             );
+                         }
+                         document.head.appendChild(css);
+-
+-                        // Google analytics
+-                        if (googleAnalytics && false) {
+-                            const tagManagerScript = document.createElement("script");
+-                            tagManagerScript.src =
+-                                "https://www.googletagmanager.com/gtag/js?id=UA-165342524-1";
+-                            tagManagerScript.setAttribute("async", "");
+-                            document.head.appendChild(tagManagerScript);
+-
+-                            const initScript = document.createElement("script");
+-                            initScript.textContent = `
+-                        window.dataLayer = window.dataLayer || [];
+-                        function gtag(){dataLayer.push(arguments);}
+-                        gtag('js', new Date());
+-                        gtag('config', 'UA-165342524-1', { anonymize_ip: true });
+-                        `;
+-                            document.head.appendChild(initScript);
+-                        }
+ 
+                         // Do not need to preload in app or standalone
+                         if (!hasLocalFiles) {
+--- a/src/js/application.js
++++ b/src/js/application.js
+@@ -14,7 +14,6 @@
+ import { NoAdProvider } from "./platform/ad_providers/no_ad_provider";
+ import { NoAchievementProvider } from "./platform/browser/no_achievement_provider";
+ import { AnalyticsInterface } from "./platform/analytics";
+-import { GoogleAnalyticsImpl } from "./platform/browser/google_analytics";
+ import { SoundImplBrowser } from "./platform/browser/sound";
+ import { PlatformWrapperImplBrowser } from "./platform/browser/wrapper";
+ import { PlatformWrapperImplElectron } from "./platform/electron/wrapper";
+@@ -29,7 +28,6 @@
+ import { MobileWarningState } from "./states/mobile_warning";
+ import { PreloadState } from "./states/preload";
+ import { SettingsState } from "./states/settings";
+-import { ShapezGameAnalytics } from "./platform/browser/game_analytics";
+ import { RestrictionManager } from "./core/restriction_manager";
+ import { PuzzleMenuState } from "./states/puzzle_menu";
+ import { ClientAPI } from "./platform/api";
+@@ -189,8 +187,9 @@
+         // Start with empty ad provider
+         this.adProvider = new NoAdProvider(this);
+         this.sound = new SoundImplBrowser(this);
+-        this.analytics = new GoogleAnalyticsImpl(this);
+-        this.gameAnalytics = new ShapezGameAnalytics(this);
++        // Gamidio: no analytics.
++        this.analytics = { initialize: () => Promise.resolve(), setUserContext() {}, trackStateEnter() {}, trackDecision() {}, trackUiClick() {} };
++        this.gameAnalytics = { initialize: () => Promise.resolve(), activateDlc: () => Promise.resolve(), handleGameStarted() {}, handleGameResumed() {}, handleLevelCompleted() {}, handleUpgradeUnlocked() {}, note() {}, noteMinor() {} };
+         this.achievementProvider = new NoAchievementProvider(this);
+     }
+ 
+--- a/src/js/core/cachebust.js
++++ b/src/js/core/cachebust.js
+@@ -4,7 +4,7 @@
+  */
+ export function cachebust(path) {
+     if (G_IS_BROWSER && !G_IS_STANDALONE && !G_IS_DEV) {
+-        return "/v/" + G_BUILD_COMMIT_HASH + "/" + path;
++        return path;
+     }
+     return path;
+ }
+--- a/src/js/platform/browser/wrapper.js
++++ b/src/js/platform/browser/wrapper.js
+@@ -148,25 +148,8 @@
+      * @returns {Promise<boolean>}
+      */
+     detectAdblock() {
+-        return Promise.race([
+-            new Promise(resolve => {
+-                // If the request wasn't blocked within a very short period of time, this means
+-                // the adblocker is not active and the request was actually made -> ignore it then
+-                setTimeout(() => resolve(false), 30);
+-            }),
+-            new Promise(resolve => {
+-                fetch("https://googleads.g.doubleclick.net/pagead/id", {
+-                    method: "HEAD",
+-                    mode: "no-cors",
+-                })
+-                    .then(res => {
+-                        resolve(false);
+-                    })
+-                    .catch(err => {
+-                        resolve(true);
+-                    });
+-            }),
+-        ]);
++        // Gamidio: no request to Google's ad server.
++        return Promise.resolve(false);
+     }
+ 
+     initializeAdProvider() {
+--- a/src/js/states/main_menu.js
++++ b/src/js/states/main_menu.js
+@@ -563,6 +563,7 @@
+     }
+ 
+     fetchPlayerCount() {
++        return; // Gamidio: no request to analytics.shapez.io from the main menu.
+         const element = this.htmlElement.querySelector(".onlinePlayerCount");
+         if (!element) {
+             return;
+--- a/src/js/states/preload.js
++++ b/src/js/states/preload.js
+@@ -106,7 +106,6 @@
+             })
+             .then(() => this.setStatus("Creating platform wrapper", 3))
+ 
+-            .then(() => this.sendBeacon())
+             .then(() => authorizeViaSSOToken(this.app, this.dialogs))
+ 
+             .then(() => this.app.platformWrapper.initialize())
+@@ -142,7 +141,6 @@
+             .then(() => this.app.gameAnalytics.initialize())
+ 
+             .then(() => this.setStatus("Connecting to api", 15))
+-            .then(() => this.fetchDiscounts())
+ 
+             .then(() => this.setStatus("Initializing settings", 20))
+             .then(() => {

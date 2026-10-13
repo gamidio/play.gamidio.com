@@ -1,0 +1,14 @@
+Shattered Pixel Dungeon — hosted by Gamidio (gamidio.com)
+
+Original game: Evan Debenham (Shattered Pixel); based on Pixel Dungeon by Watabou; web port by glassesmonkey
+Upstream source: https://github.com/glassesmonkey/shattered-pixel-dungeon-web
+Upstream commit: ce39efde1c4e9929103a1df684d94fab6aa84bed
+License: GNU GPL v3 (code and assets) (https://github.com/00-Evan/shattered-pixel-dungeon/blob/master/LICENSE.txt)
+
+Corresponding source of this copy = the upstream commit above + gamidio-changes.patch in this folder.
+
+Changes made by Gamidio:
+  - SPD-classes/src/main/java/com/watabou/glwrap/Vertexbuffer.java: web: vertex buffers always uploaded in full (partial uploads corrupted the map on some phones)
+  - built with: ./gradlew :web:webBuild (TeaVM), JDK 17
+  - (build output) index.html: keyboard focus on click; arrow keys and Space do not scroll the page around the game
+  - (build output) removed WEB-INF/ (Jetty dev-server config, unused on a static host)

@@ -1,0 +1,11 @@
+--- a/SPD-classes/src/main/java/com/watabou/glwrap/Vertexbuffer.java
++++ b/SPD-classes/src/main/java/com/watabou/glwrap/Vertexbuffer.java
+@@ -79,7 +79,7 @@
+ 
+ 		bind();
+ 
+-		if (updateStart == 0 && updateEnd == vertices.limit()){
++		if (DeviceCompat.isWeb() || (updateStart == 0 && updateEnd == vertices.limit())){ // Gamidio: web = full upload
+ 			((Buffer)vertices).position(0);
+ 			Gdx.gl.glBufferData(Gdx.gl.GL_ARRAY_BUFFER, vertices.limit()*4, vertices, Gdx.gl.GL_DYNAMIC_DRAW);
+ 		} else {
