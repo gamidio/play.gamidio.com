@@ -1,0 +1,44 @@
+--- a/Makefile
++++ b/Makefile
+@@ -54,7 +54,6 @@
+ 	-Werror\
+ 	-Wold-style-cast\
+ 	-DES_GLES\
+-	-gsource-map\
+ 	-I libjpeg-turbo-2.1.0\
+ 
+ LINK_FLAGS = $(COMMON_FLAGS)\
+@@ -63,10 +62,7 @@
+ 	-l jpeg\
+ 	-lopenal\
+ 	-lidbfs.js\
+-	--source-map-base http://localhost:6931/\
+ 	-s USE_WEBGL2=1\
+-	-s ASSERTIONS=2\
+-	-s GL_ASSERTIONS=1\
+ 	-s ASYNCIFY\
+ 	-s MIN_WEBGL_VERSION=2\
+ 	-s MAX_WEBGL_VERSION=2\
+@@ -79,8 +75,7 @@
+ 	--preload-file shaders\
+ 	--preload-file credits.txt\
+ 	--preload-file keys.txt\
+-	-s EXPORTED_RUNTIME_METHODS=['callMain']\
+-	--emrun
++	-s EXPORTED_RUNTIME_METHODS=['callMain']
+ 
+ # Source files: all .cpp in source subdirs except test/, windows/, and excluded audio suppliers
+ # Also exclude ZipFile.cpp (no minizip in emscripten)
+--- a/source/Preferences.cpp
++++ b/source/Preferences.cpp
+@@ -55,8 +55,8 @@
+ 	size_t zoomIndex = 4;
+ 	constexpr double VOLUME_SCALE = .25;
+ 
+-	// Default to fullscreen.
+-	int screenModeIndex = 1;
++	// Gamidio: windowed by default (the game runs in a frame on the page).
++	int screenModeIndex = 0;
+ 	const vector<string> SCREEN_MODE_SETTINGS = {"windowed", "fullscreen"};
+ 
+ 	// Enable standard VSync by default.

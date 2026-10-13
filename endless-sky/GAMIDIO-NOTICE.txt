@@ -1,0 +1,28 @@
+Endless Sky — hosted by Gamidio (gamidio.com)
+
+Original game: Michael Zahniser and the Endless Sky contributors; browser port (Endless Web) by Thomas Ballinger
+Upstream source: https://github.com/thomasballinger/endless-web
+Upstream commit: a5f72469249bf3344bfee44c7ee06132303576b7
+License: GNU GPL v3 (code); art and sounds public domain or Creative Commons (see the copyright file); Ubuntu font: Ubuntu Font Licence (https://github.com/endless-sky/endless-sky/blob/master/copyright)
+
+Corresponding source of this copy = the upstream commit above + gamidio-changes.patch in this folder.
+
+Changes made by Gamidio:
+  - source/Preferences.cpp: windowed by default
+  - Makefile: no source maps
+  - Makefile: no source map base URL
+  - Makefile: no runtime assertions
+  - Makefile: no GL assertions
+  - Makefile: no emrun hooks
+  - built with: make endless-sky.js (emsdk 6.0.6, as the port's CI), release flags
+  - (build output) endless-sky.html served as index.html
+  - (build output) endless-sky.data (402 MB) served in 17 parts of 24 MB
+  - (build output) js/cached-resource.js: data parts loader
+  - (build output) js/cached-resource.js: downloads the data parts
+  - (build output) js/cached-resource.js: downloads the data parts (end)
+  - (build output) index.html: number of data parts
+  - (build output) index.html: removed Plausible analytics
+  - (build output) index.html: https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.js served locally as vendor/jszip.js
+  - (build output) index.html: https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.js served locally as vendor/jszip-utils.js
+  - (build output) index.html: offline guard: no plugin downloads from GitHub
+  - (build output) index.html: keyboard focus on click; arrow keys and Space do not scroll the page around the game
