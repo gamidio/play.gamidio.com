@@ -8,6 +8,7 @@
  *   two-finger drag          right drag at the midpoint (scroll the map)
  *   pinch                    mouse wheel at the midpoint (zoom)
  * The canvas is found with window.GAMIDIO_TOUCH_TARGET (CSS selector, default "canvas").
+ * window.GAMIDIO_TOUCH_PINCH_ONLY = true: two fingers only zoom, for games where a right drag deletes (shapez).
  */
 (function () {
 	'use strict';
@@ -37,7 +38,7 @@
 			clientX: p.x, clientY: p.y, screenX: p.x, screenY: p.y,
 			button: button || 0, buttons: held
 		}));
-		last = p;
+		last = window.gamidioAim = p;  // gamidio-gamepad.js: a mouse button on the gamepad acts here
 	}
 
 	function wheel(p, dir) {
@@ -71,6 +72,7 @@
 		if (mode === 'idle' && e.target !== canvas()) return;
 		e.preventDefault();
 		e.stopImmediatePropagation();
+		window.dispatchEvent(new Event('gamidio-touch'));  // gamidio-gamepad.js cannot see this touch any more
 		var ts = e.touches;
 		if (ts.length === 1 && mode === 'idle') {
 			start = point(ts[0]);
@@ -83,7 +85,7 @@
 			pinchDist = spread(ts);
 			var m = mid(ts);
 			send('mousemove', m);
-			send('mousedown', m, 2);
+			if (!window.GAMIDIO_TOUCH_PINCH_ONLY) send('mousedown', m, 2);
 		}
 	}
 
@@ -99,9 +101,9 @@
 			else if (d < pinchDist / PINCH_STEP) dir = 1;
 			if (dir) {
 				// Games such as OpenTTD ignore the wheel while the right button scrolls: lift it for the zoom step.
-				send('mouseup', m, 2);
+				if (held & 2) send('mouseup', m, 2);
 				wheel(m, dir);
-				send('mousedown', m, 2);
+				if (!window.GAMIDIO_TOUCH_PINCH_ONLY) send('mousedown', m, 2);
 				pinchDist = d;
 			}
 			return;

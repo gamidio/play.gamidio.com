@@ -76,6 +76,17 @@
      }
      return path;
  }
+--- a/src/js/core/config.js
++++ b/src/js/core/config.js
+@@ -146,7 +146,7 @@
+     },
+ };
+ 
+-export const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
++export const IS_MOBILE = false; // Gamidio: the desktop game with on-screen controls on phones too
+ 
+ // Automatic calculations
+ globalConfig.minerSpeedItemsPerSecond = globalConfig.beltSpeedItemsPerSecond / 5;
 --- a/src/js/platform/browser/wrapper.js
 +++ b/src/js/platform/browser/wrapper.js
 @@ -148,25 +148,8 @@
@@ -134,13 +145,3 @@
  
              .then(() => this.setStatus("Initializing settings", 20))
              .then(() => {
---- a/index.html
-+++ b/index.html
-@@ -2,6 +2,7 @@
- <html lang="en" style="--ui-scale:1.33">
- 
- <head>
-+<script>window.GAMIDIO_TOUCH_TARGET="canvas"</script><script src="gamidio-touch.js"></script>
-     <title>shapez Demo - Factory Automation Game</title>
-     <!-- mobile stuff -->
-     <meta name="format-detection" content="telephone=no">

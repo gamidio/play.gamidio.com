@@ -9,6 +9,9 @@ Corresponding source of this copy = the upstream commit above + gamidio-changes.
 
 Changes made by Gamidio:
   - SPD-classes/src/main/java/com/watabou/glwrap/Vertexbuffer.java: web: vertex buffers always uploaded in full (partial uploads corrupted the map on some phones)
+  - web/src/main/java/com/shatteredpixel/shatteredpixeldungeon/web/WebPlatformSupport.java: web: text fields open the phone's keyboard through the page
   - built with: ./gradlew :web:webBuild (TeaVM), JDK 17
   - (build output) index.html: keyboard focus on click; arrow keys and Space do not scroll the page around the game
+  - (build output) index.html: phone keyboard for text fields (gamidio-textinput.js)
   - (build output) removed WEB-INF/ (Jetty dev-server config, unused on a static host)
+  - gamidio-textinput.js: Gamidio's phone keyboard for text fields (written by Gamidio, part of these changes), included in full in this folder

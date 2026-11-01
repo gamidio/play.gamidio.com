@@ -107,15 +107,16 @@
 	// In our player the frame fills the whole stage, so the gamepad reaches the screen edges; the game itself stays
 	// centered in its own proportions (owner 2026-11-01).
 	function letterbox(ratio) {
+		// Godot sizes its canvas to the frame itself and draws in the right proportions.
+		if (typeof GODOT_CONFIG !== 'undefined') return;
 		var game = document.querySelector(cfg.target || 'canvas');
 		if (!game) { setTimeout(function () { letterbox(ratio); }, 300); return; }
-		var set = function (name, value) { game.style.setProperty(name, value, 'important'); };
-		set('position', 'fixed');
-		set('left', '50%');
-		set('top', '50%');
-		set('transform', 'translate(-50%, -50%)');
-		set('width', 'min(100vw, calc(100vh * ' + ratio + '))');
-		set('height', 'min(100vh, calc(100vw / ' + ratio + '))');
+		// A style sheet, because engines rewrite the canvas's own style while they start.
+		game.setAttribute('data-gp-game', '');
+		var css = document.createElement('style');
+		css.textContent = '[data-gp-game]{position:fixed!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;' +
+			'width:min(100vw,calc(100vh * ' + ratio + '))!important;height:min(100vh,calc(100vw / ' + ratio + '))!important}';
+		document.head.appendChild(css);
 		document.documentElement.style.background = document.body.style.background = '#000';
 	}
 	addEventListener('message', function (e) {
@@ -128,6 +129,7 @@
 	});
 	if (window.parent !== window) window.parent.postMessage({gamidioGamepad: true}, '*');
 	addEventListener('touchstart', function () { root.classList.remove('idle'); }, {capture: true, passive: true, once: true});
+	addEventListener('gamidio-touch', function () { root.classList.remove('idle'); }, {once: true});
 
 	// Fullscreen (only on the game's own page; inside our player the page's fullscreen button does this). Browsers allow
 	// it only from a user gesture and the owner wants it optional, so it starts with the button. iPhone Safari has no fullscreen for pages.
@@ -253,11 +255,13 @@
 		root.appendChild(fs);
 	}
 
+	var aim = null;  // pointer mode: where the last finger was, so a mouse button on the pad acts there
 	function mouseButton(type, button) {
 		var t = document.querySelector(cfg.target || 'canvas') || document.body;
 		var r = t.getBoundingClientRect();
+		var at = aim || window.gamidioAim;
 		t.dispatchEvent(new MouseEvent(type, {bubbles: true, cancelable: true, view: window, button: button,
-			buttons: type === 'mousedown' ? (button === 2 ? 2 : 1) : 0, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2}));
+			buttons: type === 'mousedown' ? (button === 2 ? 2 : 1) : 0, clientX: at ? at.x : r.left + r.width / 2, clientY: at ? at.y : r.top + r.height / 2}));
 	}
 	function holdMouse(el, button) {
 		var n = 0;
@@ -418,7 +422,7 @@
 	if (cfg.pointer) {
 		var pid = null, last = null;
 		var mouse = function (type, t) {
-			last = {x: t.clientX, y: t.clientY};
+			aim = last = {x: t.clientX, y: t.clientY};
 			var el = document.elementFromPoint(last.x, last.y) || document.body;
 			el.dispatchEvent(new MouseEvent(type, {bubbles: true, cancelable: true, view: window, clientX: last.x, clientY: last.y, screenX: last.x, screenY: last.y, button: 0, buttons: type === 'mousedown' || type === 'mousemove' ? 1 : 0}));
 		};
@@ -476,6 +480,10 @@
 		addEventListener('touchcancel', lookEnd, {passive: false});
 	}
 
-	function mount() { document.body.appendChild(root); }
+	function mount() {
+		document.body.appendChild(root);
+		// Some games empty the page when they change screens (shapez).
+		new MutationObserver(function () { if (!root.isConnected) document.body.appendChild(root); }).observe(document.body, {childList: true});
+	}
 	if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
 })();

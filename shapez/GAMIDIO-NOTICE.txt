@@ -17,5 +17,11 @@ Changes made by Gamidio:
   - src/js/platform/browser/wrapper.js: no ad-blocker check against googleads.g.doubleclick.net
   - gulp/buildutils.js: relative asset paths (HTML/CSS)
   - src/js/core/cachebust.js: relative asset paths (JS)
+  - src/js/core/config.js: no 'not available on mobile' screen
   - gulp/html.js: removed the disabled Google Analytics snippet
   - built with: cd gulp && yarn gulp build.web-shapezio (the official web version, demo limits unchanged)
+  - (build output) index.html: on-screen gamepad for touch screens (gamidio-gamepad.js, D-048)
+  - (build output) index.html: touch controls (gamidio-touch.js, D-046): hold = right click, two fingers = move the view, pinch = zoom
+  - (build output) index.html: two fingers only zoom (a right drag deletes)
+  - gamidio-touch.js: Gamidio's touch controls (written by Gamidio, part of these changes), included in full in this folder
+  - gamidio-gamepad.js: Gamidio's on-screen gamepad (written by Gamidio, part of these changes), included in full in this folder

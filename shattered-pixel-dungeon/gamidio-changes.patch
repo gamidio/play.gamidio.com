@@ -9,3 +9,20 @@
  			((Buffer)vertices).position(0);
  			Gdx.gl.glBufferData(Gdx.gl.GL_ARRAY_BUFFER, vertices.limit()*4, vertices, Gdx.gl.GL_DYNAMIC_DRAW);
  		} else {
+--- a/web/src/main/java/com/shatteredpixel/shatteredpixeldungeon/web/WebPlatformSupport.java
++++ b/web/src/main/java/com/shatteredpixel/shatteredpixeldungeon/web/WebPlatformSupport.java
+@@ -26,6 +26,14 @@
+ 
+ 	private static FreeTypeFontGenerator basicFontGenerator;
+ 	private static FreeTypeFontGenerator asianFontGenerator;
++
++	@Override
++	public void setOnscreenKeyboardVisible(boolean value, boolean multiline) {
++		gamidioTextInput(value);
++	}
++
++	@org.teavm.jso.JSBody(params = {"on"}, script = "if (window.gamidioTextInput) window.gamidioTextInput(on);")
++	private static native void gamidioTextInput(boolean on);
+ 
+ 	@Override
+ 	public void updateDisplaySize() {
