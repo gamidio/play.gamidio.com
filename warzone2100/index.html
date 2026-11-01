@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en" class="h-100" data-bs-theme="dark">
   <head>
+<script>window.GAMIDIO_TOUCH_TARGET="#canvas"</script><script src="gamidio-touch.js"></script>
 <script src="coi-serviceworker.js"></script>
 <script>/* Gamidio: no requests to third-party servers from this game */(function(){
 var dead=new URL('gamidio-offline-blocked',location.href).href;
@@ -11,6 +12,14 @@ var W=window.WebSocket;if(W){window.WebSocket=function(u,p){if(foreign(String(u)
 })();</script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>/* Gamidio: phones get a desktop-sized page and start in landscape */(function(){
+if(!('ontouchstart' in window)||Math.min(screen.width,screen.height)>=640)return;
+document.querySelector('meta[name=viewport]').content='width=1280';
+addEventListener('DOMContentLoaded',function(){var g=window.startGame;window.startGame=function(){
+var e=document.documentElement;if(e.requestFullscreen)e.requestFullscreen({navigationUI:'hide'}).then(function(){
+if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){})}).catch(function(){});
+g.apply(this,arguments)}})})();</script>
+<style>.small-screen-blocker{display:none!important}body{min-width:0!important;min-height:0!important}</style>
     <meta name="description" content="Play Warzone 2100 in your web browser. Command the forces of The Project in a battle to rebuild the world.">
     <meta name="author" content="pastdue, and Warzone 2100 Project contributors">
     <title>Warzone 2100 - Web Edition</title>

@@ -134,3 +134,13 @@
  
              .then(() => this.setStatus("Initializing settings", 20))
              .then(() => {
+--- a/index.html
++++ b/index.html
+@@ -2,6 +2,7 @@
+ <html lang="en" style="--ui-scale:1.33">
+ 
+ <head>
++<script>window.GAMIDIO_TOUCH_TARGET="canvas"</script><script src="gamidio-touch.js"></script>
+     <title>shapez Demo - Factory Automation Game</title>
+     <!-- mobile stuff -->
+     <meta name="format-detection" content="telephone=no">

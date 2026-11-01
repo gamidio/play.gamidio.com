@@ -26,3 +26,6 @@ Changes made by Gamidio:
   - (build output) index.html: https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.js served locally as vendor/jszip-utils.js
   - (build output) index.html: offline guard: no plugin downloads from GitHub
   - (build output) index.html: keyboard focus on click; arrow keys and Space do not scroll the page around the game
+  - index.html: on-screen gamepad for touch screens (gamidio-gamepad.js, D-048)
+  - index.html: our on-screen controls replace the page's own bars on phones
+  - index.html: on-screen gamepad for touch screens (gamidio-gamepad.js, D-048)

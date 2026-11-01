@@ -16,3 +16,6 @@ Changes made by Gamidio:
   - index.html: offline guard: no update checks or lobby/IP lookups to third-party servers
   - index.html: coi-serviceworker 0.1.7 (MIT) for cross-origin isolation
   - index.html: game's own service worker not registered
+  - index.html: phones: desktop-sized page, no 'too small' screen, Play starts fullscreen in landscape
+  - index.html: touch controls (gamidio-touch.js, D-046): hold = right click, two fingers = move the view, pinch = zoom
+  - gamidio-touch.js: Gamidio's touch controls (written by Gamidio, part of these changes), included in full in this folder
