@@ -16,6 +16,7 @@
  *              // a button may press a mouse button instead: {label: 'A', mouse: 0} (0 left, 2 right)
  *     menu: {label: '☰', keys: ['Escape']},                                                  // optional
  *     extra: [{label: 'M', keys: ['m']}],  // optional: more small buttons in a row at the top, for games with many keys
+ *     dirs: 4,        // optional: start the joystick in 4 directions (no diagonals); players can switch in the gamepad menu
  *     target: 'canvas',                                                                      // element that gets the keys
  *     wheel: {left: 'ArrowLeft', right: 'ArrowRight'},  // optional, driving games: a steering wheel instead of the joystick
  *              // with buttons [{label: 'GAS', keys: ['ArrowUp'], pedal: true}, ...]: tall pedals on the right
@@ -24,8 +25,8 @@
  *                     // default a short tap in the joystick area (no stick movement) clicks the game there
  *     look: 2.5,      // optional, first-person games: dragging a finger outside the gamepad turns the view (mouse
  *                     // movementX/Y times this factor); a short tap is a click (menus, 'click to start')
- *     fullscreen: 'landscape'  // optional, games on their own page: the first touch goes fullscreen (no browser bars) and
- *                              // locks the orientation where the browser allows it (Android); a ⛶ button goes back in
+ *     fullscreen: 'landscape'  // optional, games on their own page: a ⛶ button goes fullscreen (no browser bars) and
+ *                              // locks the orientation where the browser allows it (Android)
  *   };
  * Keys are KeyboardEvent.key values; code and keyCode are filled in for engines that read them (SDL/Emscripten).
  */
@@ -90,12 +91,12 @@
 		'.gp-btn.on{background:var(--c,rgba(255,255,255,.8));color:#111;text-shadow:none}' +
 		'.gp-small{width:44px;height:44px;font-size:16px}' +
 		'#gp-extra{position:absolute;top:12px;left:0;right:0;display:flex;justify-content:center;gap:8px;pointer-events:none}#gp-extra .gp-btn{position:static}' +
+		'#gp-menu{position:absolute;left:12px;top:64px;pointer-events:auto;border-radius:12px;overflow:hidden;background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.35);font-size:15px}' +
+		'.gp-option{padding:12px 18px;color:#fff;white-space:nowrap;touch-action:none}.gp-option+.gp-option{border-top:1px solid rgba(255,255,255,.2)}.gp-option.on{color:#4ade80}' +
 		'.gp-pedal{width:min(88px,24vh);height:min(150px,44vh);border-radius:16px;font-size:16px}' +
 		'#gp-wheel{position:absolute;left:24px;bottom:calc(18px + env(safe-area-inset-bottom));width:min(170px,46vh);height:min(170px,46vh);pointer-events:auto;touch-action:none;opacity:.85}' +
 		'#gp-wheel svg{display:block;width:100%;height:100%;filter:drop-shadow(0 0 1px rgba(0,0,0,.6))}' +
-		'#gp-hint{position:fixed;left:50%;bottom:18%;transform:translateX(-50%);z-index:2147483001;pointer-events:none;padding:12px 22px;border-radius:999px;' +
-		'background:rgba(0,0,0,.72);color:#fff;font:600 17px system-ui,sans-serif;border:1px solid rgba(255,255,255,.35);animation:gp-pulse 1.6s ease-in-out infinite}' +
-		'@keyframes gp-pulse{50%{opacity:.55}}';
+		'';
 	(document.head || document.documentElement).appendChild(css);
 
 	var root = document.createElement('div');
@@ -103,15 +104,33 @@
 	root.className = 'idle';
 	// Games shown in a scaled-down frame (D-062): the player reports the scale, so the gamepad keeps its real size.
 	var gpZoom = 1;
+	// In our player the frame fills the whole stage, so the gamepad reaches the screen edges; the game itself stays
+	// centered in its own proportions (owner 2026-11-01).
+	function letterbox(ratio) {
+		var game = document.querySelector(cfg.target || 'canvas');
+		if (!game) { setTimeout(function () { letterbox(ratio); }, 300); return; }
+		var set = function (name, value) { game.style.setProperty(name, value, 'important'); };
+		set('position', 'fixed');
+		set('left', '50%');
+		set('top', '50%');
+		set('transform', 'translate(-50%, -50%)');
+		set('width', 'min(100vw, calc(100vh * ' + ratio + '))');
+		set('height', 'min(100vh, calc(100vw / ' + ratio + '))');
+		document.documentElement.style.background = document.body.style.background = '#000';
+	}
 	addEventListener('message', function (e) {
-		if (!e.data || !e.data.gamidioScale) return;
+		if (!e.data) return;
+		if (e.data.gamidioAsk) window.parent.postMessage({gamidioGamepad: true}, '*');
+		if (e.data.gamidioFill) letterbox(e.data.gamidioFill);
+		if (!e.data.gamidioScale) return;
 		gpZoom = 1 / e.data.gamidioScale;
 		root.style.zoom = gpZoom;
 	});
+	if (window.parent !== window) window.parent.postMessage({gamidioGamepad: true}, '*');
 	addEventListener('touchstart', function () { root.classList.remove('idle'); }, {capture: true, passive: true, once: true});
 
 	// Fullscreen (only on the game's own page; inside our player the page's fullscreen button does this). Browsers allow
-	// it only from a user gesture, so it starts with the first touch. iPhone Safari has no fullscreen for pages.
+	// it only from a user gesture and the owner wants it optional, so it starts with the button. iPhone Safari has no fullscreen for pages.
 	var el = document.documentElement;
 	var canFull = cfg.fullscreen && window.top === window && (el.requestFullscreen || el.webkitRequestFullscreen);
 	function isFull() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
@@ -122,29 +141,6 @@
 			var lock = function () { try { if (typeof cfg.fullscreen === 'string' && screen.orientation && screen.orientation.lock) screen.orientation.lock(cfg.fullscreen).catch(function () {}); } catch (e) {} };
 			if (r && r.then) r.then(lock, function () {}); else lock();
 		} catch (e) {}
-	}
-	if (canFull) {
-		// A new tab cannot open in fullscreen by itself (browsers require a tap in the page), so ask for that tap at once.
-		var hint = document.createElement('div');
-		hint.id = 'gp-hint';
-		hint.textContent = 'Tap to play fullscreen';
-		var shownAt = 0;
-		var hideHint = function () { if (hint.parentNode) hint.parentNode.removeChild(hint); };
-		// The first tap only switches to fullscreen; it must not also press whatever menu item is under the finger.
-		var first = true;
-		var swallow = function (e) { if (!first) return; e.preventDefault(); e.stopImmediatePropagation(); };
-		addEventListener('touchstart', function (e) { if (first && !e.target.closest('.gp-btn,#gp-zone')) swallow(e); else first = false; }, {capture: true, passive: false});
-		addEventListener('touchend', function (e) {
-			if (!first) return;
-			first = false; swallow(e); goFull(); hideHint(); shownAt = Date.now();
-		}, {capture: true, passive: false});
-		['mousedown', 'mouseup', 'click'].forEach(function (type) {  // mouse events the browser derives from that tap
-			addEventListener(type, function (e) { if (e.isTrusted && Date.now() - shownAt < 700) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);
-		});
-		var addHint = function () { document.body.appendChild(hint); };
-		addEventListener('mousedown', hideHint, true);  // touch-screen laptops played with a mouse or keyboard
-		addEventListener('keydown', hideHint, true);
-		if (document.body) addHint(); else document.addEventListener('DOMContentLoaded', addHint);
 	}
 	root.innerHTML = stickOn ? '<div id="gp-zone" class="gp-pad"></div>' : '<div></div>';
 	var zone = root.firstChild;
@@ -187,7 +183,16 @@
 			var x = document.createElement('div');
 			x.className = 'gp-btn gp-small';
 			x.textContent = b.label;
-			hold(x, b.keys);
+			if (b.keyboard) {  // Opens the phone's keyboard for the game's text fields (gamidio-textinput.js).
+				var typing = false;
+				x.addEventListener('touchstart', function (e) { e.preventDefault(); e.stopPropagation(); }, {passive: false});
+				x.addEventListener('touchend', function (e) {
+					e.preventDefault(); e.stopPropagation();
+					typing = !typing;
+					x.classList.toggle('on', typing);
+					if (window.gamidioTextInput) window.gamidioTextInput(typing);
+				}, {passive: false});
+			} else hold(x, b.keys);
 			extra.appendChild(x);
 		});
 		root.appendChild(extra);
@@ -195,13 +200,45 @@
 	var toggle = document.createElement('div');
 	toggle.className = 'gp-btn gp-small';
 	toggle.textContent = '🎮';
-	toggle.title = 'Show or hide the on-screen gamepad';
+	toggle.title = 'Gamepad options';
 	toggle.style.left = '12px'; toggle.style.top = '12px';
+	// The mini menu: joystick in 8 directions or only 4 (no walking at an angle), or hide the gamepad. The choice is kept.
+	var menu = document.createElement('div');
+	menu.id = 'gp-menu';
+	menu.hidden = true;
+	function saved() { try { return localStorage.getItem('gamidio-gamepad-dirs'); } catch (e) { return null; } }
+	var dirCount = Number(saved()) || cfg.dirs || 8;
+	function option(label, active, action) {
+		var o = document.createElement('div');
+		o.className = 'gp-option' + (active() ? ' on' : '');
+		o.textContent = label();
+		o.addEventListener('touchstart', function (e) {
+			e.preventDefault(); e.stopPropagation();
+			action();
+			menu.hidden = true;
+		}, {passive: false});
+		return o;
+	}
+	function setDirCount(n) {
+		dirCount = n;
+		try { localStorage.setItem('gamidio-gamepad-dirs', String(n)); } catch (e) {}
+	}
+	function fillMenu() {
+		menu.textContent = '';
+		if (stickOn) {
+			menu.appendChild(option(function () { return '8 directions'; }, function () { return dirCount === 8; }, function () { setDirCount(8); }));
+			menu.appendChild(option(function () { return '4 directions'; }, function () { return dirCount === 4; }, function () { setDirCount(4); }));
+		}
+		var off = root.classList.contains('off');
+		menu.appendChild(option(function () { return off ? 'Show controls' : 'Hide controls'; }, function () { return false; }, function () { root.classList.toggle('off'); }));
+	}
 	toggle.addEventListener('touchstart', function (e) {
 		e.preventDefault(); e.stopPropagation();
-		root.classList.toggle('off');
+		fillMenu();
+		menu.hidden = !menu.hidden;
 	}, {passive: false});
 	root.appendChild(toggle);
+	root.appendChild(menu);
 	if (canFull) {
 		var fs = document.createElement('div');
 		fs.className = 'gp-btn gp-small';
@@ -335,6 +372,11 @@
 			if (a > 112.5 || a < -112.5) dirs.push('left');
 			if (a > 22.5 && a < 157.5) dirs.push('down');
 			if (a < -22.5 && a > -157.5) dirs.push('up');
+			if (dirCount === 4) {  // Strictly one axis; the current one stays until the other is clearly stronger, so a straight line stays straight.
+				var along = held[0] === 'left' || held[0] === 'right' ? Math.abs(dx) * 1.3 > Math.abs(dy)
+					: held[0] ? Math.abs(dx) > Math.abs(dy) * 1.3 : Math.abs(dx) > Math.abs(dy);
+				dirs = [along ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up')];
+			}
 			setDirs(dirs);
 		}
 	}, {passive: false});

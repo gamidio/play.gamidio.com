@@ -1,6 +1,6 @@
 --- a/index.html
 +++ b/index.html
-@@ -1,13 +1,30 @@
+@@ -1,13 +1,27 @@
  <!doctype html>
  <html lang="en" class="h-100" data-bs-theme="dark">
    <head>
@@ -15,13 +15,10 @@
 +})();</script>
      <meta charset="utf-8">
      <meta name="viewport" content="width=device-width, initial-scale=1">
-+<script>/* Gamidio: phones get a desktop-sized page and start in landscape */(function(){
++<script>/* Gamidio: phones get a desktop-sized page */(function(){
 +if(!('ontouchstart' in window)||Math.min(screen.width,screen.height)>=640)return;
 +document.querySelector('meta[name=viewport]').content='width=1280';
-+addEventListener('DOMContentLoaded',function(){var g=window.startGame;window.startGame=function(){
-+var e=document.documentElement;if(e.requestFullscreen)e.requestFullscreen({navigationUI:'hide'}).then(function(){
-+if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){})}).catch(function(){});
-+g.apply(this,arguments)}})})();</script>
++})();</script>
 +<style>.small-screen-blocker{display:none!important}body{min-width:0!important;min-height:0!important}</style>
      <meta name="description" content="Play Warzone 2100 in your web browser. Command the forces of The Project in a battle to rebuild the world.">
      <meta name="author" content="pastdue, and Warzone 2100 Project contributors">
@@ -32,7 +29,7 @@
      
      <!-- Favicons -->  
      <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-@@ -453,7 +470,7 @@
+@@ -453,7 +467,7 @@
    <div class="emscripten_container unselectable" id="emscripten_container" style="display:none;">
      <canvas class="emscripten unselectable" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
    </div>
@@ -41,7 +38,7 @@
      <div class="small-screen-blocker px-3">
        <main class="py-3">
          <h1>Too Small</h1>
-@@ -1513,6 +1530,7 @@
+@@ -1513,6 +1527,7 @@
      }
      
      function wz_serviceworker_register() {
@@ -49,13 +46,15 @@
        if (!('serviceWorker' in navigator)) {
          console.log('serviceWorker not available');
          return;
-@@ -1823,6 +1841,6 @@
+@@ -1823,6 +1838,7 @@
      }
    </script>
    <script async type="text/javascript" src="warzone2100.js"></script>
 -  <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "86fc2fd5b4b44e60836e1c059333c8ad"}'></script><!-- End Cloudflare Web Analytics -->
+-  </body>
 +  
-   </body>
++  <script src="gamidio-fullscreen.js"></script>
++</body>
  </html>
 --- a/service-worker.js
 +++ b/service-worker.js

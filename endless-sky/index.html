@@ -173,7 +173,8 @@ var W=window.WebSocket;if(W){window.WebSocket=function(u,p){if(foreign(String(u)
         display: none;
       }
     </style>
-  <style>@media (pointer: coarse) { .ugly-header, .touch-controls { display: none !important } }</style>
+  <script>window.GAMIDIO_TEXT_KEYS = true</script><script src="gamidio-textinput.js"></script>
+<style>@media (pointer: coarse) { .ugly-header, .touch-controls { display: none !important } }</style>
 </head>
   <body>
     <div class="error">
@@ -596,6 +597,6 @@ var W=window.WebSocket;if(W){window.WebSocket=function(u,p){if(foreign(String(u)
         }
       }, {passive: false})
     </script>
-  <script>window.GAMIDIO_GAMEPAD={"buttons": [{"label": "A", "keys": ["Tab"]}, {"label": "B", "keys": ["q"]}, {"label": "X", "keys": ["w"]}, {"label": "Y", "keys": ["l"]}], "extra": [{"label": "J", "keys": ["j"]}, {"label": "M", "keys": ["m"]}, {"label": "I", "keys": ["i"]}], "menu": {"label": "☰", "keys": ["Escape"]}}</script><script src="gamidio-gamepad.js"></script>
+  <script>window.GAMIDIO_GAMEPAD={"buttons": [{"label": "A", "keys": ["Tab"]}, {"label": "B", "keys": ["q"]}, {"label": "X", "keys": ["w"]}, {"label": "Y", "keys": ["l"]}], "extra": [{"label": "J", "keys": ["j"]}, {"label": "M", "keys": ["m"]}, {"label": "I", "keys": ["i"]}, {"label": "⌨", "keyboard": true}], "menu": {"label": "☰", "keys": ["Escape"]}}</script><script src="gamidio-gamepad.js"></script>
 </body>
 </html>
